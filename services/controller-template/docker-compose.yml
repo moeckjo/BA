@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+    controller:
+        container_name: controller
+        build:
+            context: source
+        restart: always  
+        user: "${USER_ID}:${GROUP_ID}"
+        environment:
+            - CONTROLLER_NAME=${CONTROLLER_NAME}
+            - DEBUG=${DEBUG}
+            - MQTT_BROKER_HOST=${MQTT_BROKER_HOST}
+            - MQTT_BROKER_PORT=${MQTT_BROKER_PORT}
+            - MQTT_SENSOR_DEVIATION_TOPIC=${MQTT_SENSOR_DEVIATION_TOPIC}
+            - MQTT_SCHEDULE_TOPIC=${MQTT_SCHEDULE_TOPIC}
+            - MQTT_SETPOINT_TOPIC=${MQTT_SETPOINT_TOPIC}
+            - REL_MAX_DIFFERENCE=${REL_MAX_DIFFERENCE}
+            - ABS_MAX_DIFFERENCE=${ABS_MAX_DIFFERENCE}

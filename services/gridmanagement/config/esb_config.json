@@ -1,0 +1,21 @@
+{
+  "base_url": "https://inubit.flexqgrid.online/api/gems",
+  "endpoints": {
+    "schedule": "fahrplan",
+    "flexibility": "flexibility",
+    "ack_setpoint": "confirmlimit",
+    "realization_setpoint": "appliedlimit",
+    "market_orders": "marktgebot",
+    "measurements": "ftt_visu"
+  },
+  "endpoints_with_uuid": {
+    "quotas": "quote",
+    "meter_data": "messwerte",
+    "ev_charging_user_input": "car_charge"
+},
+  "auth": {
+    "user": "user",
+    "pw": "password"
+  },
+  "online": [9,17]
+}

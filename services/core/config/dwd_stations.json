@@ -1,0 +1,17 @@
+[
+    {
+      "location_id": "Q712",
+      "location_name": "Elzach-Fisnacht",
+      "feature_order": 1
+    },
+    {
+      "location_id": "10803",
+      "location_name": "Freiburg",
+      "feature_order": 2
+    },
+    {
+      "location_id": "10805",
+      "location_name": "Lahr",
+      "feature_order": 3
+    }
+]

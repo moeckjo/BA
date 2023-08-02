@@ -1,0 +1,6 @@
+{
+  "modbus-tcp-connector-fronius-hybrid/actuator/battery_active_power": 20000,
+  "modbus-tcp-connector-keba-p30/actuator/active_power": 11000,
+  "rscp-connector-e3dc/actuator/active_power": null,
+  "modbus-tcp-connector-adstec/actuator/active_power": 0
+}

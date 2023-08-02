@@ -1,0 +1,142 @@
+{
+    "evse": {
+        "charging_state": {
+            "sensor": "modbus-tcp-connector-keba-p30/sensor/charging_state",
+            "actuator": null
+        },
+        "current_phase_1": {
+            "sensor": "modbus-tcp-connector-keba-p30/sensor/current_phase_1",
+            "actuator": null
+        },
+        "current_phase_2": {
+            "sensor": "modbus-tcp-connector-keba-p30/sensor/current_phase_2",
+            "actuator": null
+        },
+        "current_phase_3": {
+            "sensor": "modbus-tcp-connector-keba-p30/sensor/current_phase_3",
+            "actuator": null
+        },
+        "active_power": {
+            "sensor": "modbus-tcp-connector-keba-p30/sensor/active_power",
+            "actuator": "modbus-tcp-connector-keba-p30/actuator/active_power"
+        },
+        "voltage_phase_1": {
+            "sensor": "modbus-tcp-connector-keba-p30/sensor/voltage_phase_1",
+            "actuator": null
+        },
+        "voltage_phase_2": {
+            "sensor": "modbus-tcp-connector-keba-p30/sensor/voltage_phase_2",
+            "actuator": null
+        },
+        "voltage_phase_3": {
+            "sensor": "modbus-tcp-connector-keba-p30/sensor/voltage_phase_3",
+            "actuator": null
+        },
+        "connected": {
+            "sensor": "modbus-tcp-connector-keba-p30/sensor/connected",
+            "actuator": null
+        }
+    },
+    "bess": {
+        "vsoc": {
+            "sensor": "rscp-connector-e3dc/sensor/vsoc",
+            "actuator": null
+        },
+        "active_power": {
+            "sensor": "rscp-connector-e3dc/sensor/active_power",
+            "actuator": "rscp-connector-e3dc/actuator/active_power"
+        },
+        "soc": {
+            "sensor": "rscp-connector-e3dc/sensor/soc",
+            "actuator": null
+        },
+        "charge_cycles": {
+            "sensor": "rscp-connector-e3dc/sensor/charge_cycles",
+            "actuator": null
+        },
+        "current": {
+            "sensor": "rscp-connector-e3dc/sensor/current",
+            "actuator": null
+        },
+        "status_code": {
+            "sensor": "rscp-connector-e3dc/sensor/status_code",
+            "actuator": null
+        },
+        "error_code": {
+            "sensor": "rscp-connector-e3dc/sensor/error_code",
+            "actuator": null
+        },
+        "module_voltage": {
+            "sensor": "rscp-connector-e3dc/sensor/module_voltage",
+            "actuator": null
+        },
+        "terminal_voltage": {
+            "sensor": "rscp-connector-e3dc/sensor/terminal_voltage",
+            "actuator": null
+        },
+        "ems_used_charge_limit": {
+            "sensor": "rscp-connector-e3dc/sensor/ems_used_charge_limit",
+            "actuator": null
+        },
+        "ems_bat_charge_limit": {
+            "sensor": "rscp-connector-e3dc/sensor/ems_bat_charge_limit",
+            "actuator": null
+        },
+        "ems_dcdc_charge_limit": {
+            "sensor": "rscp-connector-e3dc/sensor/ems_dcdc_charge_limit",
+            "actuator": null
+        },
+        "ems_user_charge_limit": {
+            "sensor": "rscp-connector-e3dc/sensor/ems_user_charge_limit",
+            "actuator": null
+        },
+        "ems_used_discharge_limit": {
+            "sensor": "rscp-connector-e3dc/sensor/ems_used_discharge_limit",
+            "actuator": null
+        },
+        "ems_bat_discharge_limit": {
+            "sensor": "rscp-connector-e3dc/sensor/ems_bat_discharge_limit",
+            "actuator": null
+        },
+        "ems_dcdc_discharge_limit": {
+            "sensor": "rscp-connector-e3dc/sensor/ems_dcdc_discharge_limit",
+            "actuator": null
+        },
+        "ems_user_discharge_limit": {
+            "sensor": "rscp-connector-e3dc/sensor/ems_user_discharge_limit",
+            "actuator": null
+        }
+    },
+    "pv": {
+        "condition": {
+            "sensor": "modbus-tcp-connector-sma/sensor/condition",
+            "actuator": null
+        },
+        "nominal_power": {
+            "sensor": "modbus-tcp-connector-sma/sensor/nominal_power",
+            "actuator": null
+        },
+        "active_power": {
+            "sensor": "modbus-tcp-connector-sma/sensor/active_power",
+            "actuator": "modbus-tcp-connector-sma/actuator/active_power"
+        }
+    },
+    "pv2": {
+        "active_power": {
+            "sensor": "rscp-connector-e3dc/sensor/ext_generator_active_power",
+            "actuator": null
+        }
+    },
+    "consumption": {
+        "active_power": {
+            "sensor": "rscp-connector-e3dc/sensor/home_consumption_active_power",
+            "actuator": null
+        }
+    },
+    "grid": {
+        "active_power": {
+            "sensor": "rscp-connector-e3dc/sensor/grid_exchange_active_power",
+            "actuator": null
+        }
+    }
+}

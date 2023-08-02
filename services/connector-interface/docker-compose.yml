@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+    bem-connector-interface:
+        build:
+            context: source
+            dockerfile: Dockerfile
+            args:
+              BEM_BASE_IMAGE_TAG: ${BEM_BASE_IMAGE_TAG}
+              BEM_ROOT_DIR: /bem
+        image: ${CONNECTOR_INTERFACE_NAME}:${BEM_CONNECTOR_INTERFACE_IMAGE_TAG}
+        hostname: &connector_interface_name ${CONNECTOR_INTERFACE_NAME}
+        container_name: *connector_interface_name
+        restart: always
+        user: "${UID}:${GID}"
+        depends_on:
+          - mqtt-broker
+          - rabbitmq
+        volumes:
+          - ./config/:/bem/interface/config/
+        env_file:
+          - .env

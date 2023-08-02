@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+    mqtt-test-listener:
+        build:
+            context: source
+            dockerfile: Dockerfile
+        image: ${MQTT_TEST_LISTENER_NAME}:${MQTT_TEST_LISTENER_IMAGE_TAG}
+        hostname: &mqtt_test_listener_name ${MQTT_TEST_LISTENER_NAME}
+        container_name: *mqtt_test_listener_name
+        restart: always
+        depends_on:
+            - mqtt-broker
+        env_file:
+          - .env

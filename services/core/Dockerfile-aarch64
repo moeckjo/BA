@@ -1,0 +1,69 @@
+ARG BEM_BASE_IMAGE_TAG
+ARG TENSORFLOW_IMAGE_TAG
+
+FROM bem-base:$BEM_BASE_IMAGE_TAG as base
+ARG BEM_ROOT_DIR
+ARG BEM_BASE_DEPS_WHEELS_ARCHIVE
+ARG BEM_BASE_DEPS_WHEELS
+
+
+WORKDIR /bem
+RUN python setup_db.py bdist_wheel -d .
+RUN mv db-1.0-py3-none-any.whl wheels/db-1.0-py3-none-any.whl
+# Make archive with wheels of bem-base dependencies + db package
+RUN tar vczf ${BEM_BASE_DEPS_WHEELS_ARCHIVE} ${BEM_BASE_DEPS_WHEELS}
+
+FROM ubuntu-tensorflow/arm64v8:$TENSORFLOW_IMAGE_TAG
+ARG BEM_ROOT_DIR
+ARG BEM_BASE_DEPS_WHEELS_ARCHIVE
+ARG BEM_BASE_DEPS_WHEELS
+
+WORKDIR /bem
+RUN pip freeze > ./tf-requirements.txt
+
+RUN groupadd -g 999 bem && useradd -r -u 999 -g bem bem
+RUN chown -R bem:bem .
+
+# Install GLPK (solver for optimization)
+RUN apt-get update && apt-get -y install glpk-utils
+RUN glpsol --version
+
+# Copy wheel archive and requirements file from bem-base
+COPY --from=base /bem/${BEM_BASE_DEPS_WHEELS_ARCHIVE} ${BEM_BASE_DEPS_WHEELS_ARCHIVE}
+#COPY --from=base /bem/requirements.txt ./requirements_bem.txt
+# Add db package to requirements
+#RUN echo db >> requirements_bem.txt
+RUN tar vzxf ${BEM_BASE_DEPS_WHEELS_ARCHIVE}
+
+COPY requirements.txt .
+RUN echo db >> requirements.txt
+RUN pip install -r requirements.txt -f ${BEM_BASE_DEPS_WHEELS} #--no-index
+# Install tensorflow requirements again to ensure compatible versions (overrides version from bem_base if necessary)
+RUN pip install -r tf-requirements.txt -f /dep-wheels --no-index
+
+# Decompress wheel archive and install the packages
+#RUN pip install -r requirements_bem.txt -f ${BEM_BASE_DEPS_WHEELS} --no-index
+
+# Remove all wheels to shrink image size
+RUN rm -r /dep-wheels /tf-wheel /bem/${BEM_BASE_DEPS_WHEELS}
+RUN rm ${BEM_BASE_DEPS_WHEELS_ARCHIVE}
+
+# Copy all necessary data and source code
+COPY pv_prediction_models ./pv_prediction_models
+COPY source/core ./core
+COPY source/tests ./tests
+
+# Install
+COPY setup.py .
+RUN pip install -e .
+
+# Run tests
+# Temporarily copy .env with all variables needed to run the tests
+#COPY .env .
+#RUN pytest -v ./tests
+## The actual .env is mounted when running the container, hence remove this one
+#RUN rm .env
+
+WORKDIR core
+RUN chown -R bem:bem .
+

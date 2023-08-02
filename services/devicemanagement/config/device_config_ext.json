@@ -1,0 +1,76 @@
+{
+  "pv": {
+    "category": "generator",
+    "subcategory": "pv",
+    "product": "PV15.0",
+    "active_power_nominal_kW": 15,
+    "inverter_eff": 0.97,
+    "continuous_mod": false,
+    "curtailment_levels": [0, 0.3, 0.6, 1],
+    "data_resolution_sec": 1,
+    "energy_carrier": "el"
+  },
+  "bess": {
+    "category": "storage",
+    "subcategory": "bess",
+    "product": "SENEC.Home V2.1",
+    "active_power_charge_nominal_kW": 2.5,
+    "active_power_discharge_nominal_kW": 2.25,
+    "capacity_kWh": 10,
+    "soc_min": 0.1,
+    "soc_max": 0.95,
+    "efficiency": 0.9,
+    "relative_loss_per_month": 0.02,
+    "energy_carrier": "el"
+  },
+
+  "hp": {
+    "category": "converter",
+    "subcategory": "hp",
+    "product": "Vitocal 300-G",
+    "inverter": true,
+    "controllable": false,
+    "active_power_th_min_kW": 1.7,
+    "active_power_th_max_kW": 8.6,
+    "scop_w35": 5.29,
+    "scop_w55": 3.72,
+    "medium": "brine",
+    "energy_carrier_in": "el",
+    "energy_carrier_out": "heat"
+  },
+  "hp_nonmod": {
+    "category": "converter",
+    "subcategory": "hp",
+    "product": "Vitocal 200-G",
+    "inverter": false,
+    "controllable": false,
+    "active_power_th_max_kW": 10.4,
+    "scop_b0/w35": 4.8,
+    "medium": "brine",
+    "energy_carrier_in": "el",
+    "energy_carrier_out": "heat"
+  },
+  "hwt": {
+    "category": "storage",
+    "subcategory": "hwt",
+    "product": "Vitocell 100-V",
+    "volume_l": 200,
+    "temp_max_C": 65,
+    "temp_min_C": 30,
+    "efficiency_charging": 0.9,
+    "efficiency_discharging": 0.9,
+    "EU_EE_class": "B",
+    "energy_carrier": "heat"
+  },
+  "evse": {
+    "category": "consumer",
+    "subcategory": "evse",
+    "product": "Renault Zoe",
+    "capacity_kWh": 41,
+    "active_power_charge_nominal_kW": 11,
+    "active_power_charge_min_kW": 1,
+    "efficiency": 0.9,
+    "fuel_economy_kWh/km": 0.24,
+    "energy_carrier": "el"
+  }
+}

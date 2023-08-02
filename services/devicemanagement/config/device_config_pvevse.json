@@ -1,0 +1,26 @@
+{
+  "pv": {
+    "category": "generator",
+    "subcategory": "pv",
+    "product": "PV10.0",
+    "active_power_nominal_kW": 10,
+    "inverter_eff": 0.97,
+    "continuous_mod": false,
+    "curtailment_levels": [0, 0.3, 0.6, 1],
+    "data_resolution_sec": 1,
+    "energy_carrier": "el",
+    "measurement_fields": ["active_power"]
+  },
+  "evse": {
+    "category": "consumer",
+    "subcategory": "evse",
+    "product": "Renault Zoe",
+    "capacity_kWh": 41,
+    "active_power_charge_nominal_kW": 11,
+    "active_power_charge_min_kW": 1,
+    "efficiency": 0.9,
+    "fuel_economy_kWh/km": 0.24,
+    "energy_carrier": "el",
+    "measurement_fields": ["active_power"]
+  }
+}

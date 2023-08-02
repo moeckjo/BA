@@ -1,0 +1,4 @@
+redis==3.4.1
+celery==4.4.2
+pika==1.2.0
+python-dotenv~=0.20.0

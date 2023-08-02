@@ -1,0 +1,17 @@
+[
+  {
+    "name": "",
+    "name_env_var": "RABBITMQ_BEM_INBOX",
+    "type": "topic"
+  },
+  {
+    "name": "",
+    "name_env_var": "RABBITMQ_BEM_CONTROL",
+    "type": "topic"
+  },
+  {
+    "name": "",
+    "name_env_var": "RABBITMQ_GRID_SETPOINT",
+    "type": "fanout"
+  }
+]

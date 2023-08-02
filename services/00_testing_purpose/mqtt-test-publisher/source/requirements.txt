@@ -1,0 +1,4 @@
+python-dotenv==0.15.*
+psutil==5.8.0
+pandas==1.2.5
+paho-mqtt==1.5.*

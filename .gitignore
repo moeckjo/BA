@@ -1,0 +1,10 @@
+.idea/
+package_setups/*/build
+*.egg-info
+*.whl
+!bem_base_images/tensorflow-arm64v8/dep-wheels/*.whl
+data/mongodb/*
+data/redis/*
+data/influxdb/
+*__pycache__*
+data/grafana

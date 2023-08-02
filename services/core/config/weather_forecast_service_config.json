@@ -1,0 +1,16 @@
+{
+  "base_url": "https://iik-energy-services.fzi.de/dwd-mosmix-data-service/v1/request/",
+  "status_path": "status/",
+  "result_path": "result/",
+  "updates": "latest",
+  "parameters": {
+    "sun_duration": {
+      "key": "SunD1",
+      "resolution": 3600,
+      "reference": "back"
+    }
+  },
+  "username": "flexqgrid",
+  "password": "AQo627qJ37TkyFWIzgID3GIDtf1cDHJx",
+  "data_field": "mosmix_data"
+}

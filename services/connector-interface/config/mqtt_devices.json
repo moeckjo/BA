@@ -1,0 +1,17 @@
+{
+    "pv": {
+        "controller": "pv/controller",
+        "error": "pv/error",
+        "deviation": "pv/controller/deviation"
+    },
+    "evse": {
+        "controller": "evse/controller",
+        "error": "evse/error",
+        "deviation": "evse/controller/deviation"
+    },
+    "bess": {
+        "controller": "bess/controller",
+        "error": "bess/error",
+        "deviation": "bess/controller/deviation"
+    }
+}

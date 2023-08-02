@@ -1,0 +1,18 @@
+{
+  "sensor": {
+    "read_holding_registers__1000": "/sensor/charging_state",
+    "read_holding_registers__1004": "/sensor/connected",
+    "read_holding_registers__1006": "/error",
+    "read_holding_registers__1008": "/sensor/current_phase_1",
+    "read_holding_registers__1010": "/sensor/current_phase_2",
+    "read_holding_registers__1012": "/sensor/current_phase_3",
+    "read_holding_registers__1020": "/sensor/active_power",
+    "read_holding_registers__1040": "/sensor/voltage_phase_1",
+    "read_holding_registers__1042": "/sensor/voltage_phase_2",
+    "read_holding_registers__1044": "/sensor/voltage_phase_3"
+  },
+  "actuator": {
+    "/actuator/active_power": "write_register__5004__1__>H",
+    "/actuator/enable": "write_register__5014__1__>H"
+  }
+}

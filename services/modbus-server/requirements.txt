@@ -1,0 +1,5 @@
+pymodbus==2.4.0
+twisted==21.2.0
+pika==1.2.0
+# pytest==6.2.4
+

@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+    rscp-connector-e3dc:
+        container_name: ${CONNECTOR_NAME}
+        build:
+            context: source
+        restart: always
+        user: "${USER_ID}:${GROUP_ID}"
+        environment:
+            - CONNECTOR_NAME=${CONNECTOR_NAME}
+            - DEBUG=${DEBUG}
+
+            - E3DC_IP=${E3DC_IP}
+            - E3DC_USERNAME=${E3DC_USERNAME}
+            - E3DC_PASSWORD=${E3DC_PASSWORD}
+            - E3DC_KEY=${E3DC_KEY}
+
+            - POLLING_FREQUENCY=${POLLING_FREQUENCY}
+            - SEND_COMMAND_FREQUENCY=${SEND_COMMAND_FREQUENCY}
+
+            - MQTT_BROKER_HOST=${MQTT_BROKER_HOST}
+            - MQTT_BROKER_PORT=${MQTT_BROKER_PORT}
+            - MQTT_FREQUENCY=${MQTT_FREQUENCY}
+
+            - MQTT_E3DC_MAP_PATH=${MQTT_E3DC_MAP_PATH}

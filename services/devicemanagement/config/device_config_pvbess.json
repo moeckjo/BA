@@ -1,0 +1,38 @@
+{
+  "pv": {
+    "category": "generator",
+    "subcategory": "pv",
+    "product": "PV15.0",
+    "active_power_nominal_kW": 15,
+    "inverter_eff": 0.97,
+    "continuous_mod": false,
+    "curtailment_levels": [
+      0,
+      0.3,
+      0.6,
+      1
+    ],
+    "data_resolution_sec": 1,
+    "energy_carrier": "el",
+    "measurement_fields": [
+      "active_power"
+    ]
+  },
+  "bess": {
+    "category": "storage",
+    "subcategory": "bess",
+    "product": "SENEC.Home V2.1",
+    "active_power_charge_nominal_kW": 2.5,
+    "active_power_discharge_nominal_kW": 2.25,
+    "capacity_kWh": 10,
+    "soc_min": 0.1,
+    "soc_max": 0.95,
+    "efficiency": 0.9,
+    "relative_loss_per_month": 0.02,
+    "energy_carrier": "el",
+    "measurement_fields": [
+      "active_power",
+      "soc"
+    ]
+  }
+}

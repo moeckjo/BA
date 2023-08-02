@@ -1,0 +1,47 @@
+{
+  "pv": {
+    "category": "generator",
+    "subcategory": "pv",
+    "product": "DELTA M6A",
+    "active_power_nominal_kW": 6.0,
+    "inverter_eff": 0.97,
+    "continuous_mod": true,
+    "energy_carrier": "el",
+    "measurement_fields": ["active_power"]
+  },
+  "bess": {
+    "category": "storage",
+    "subcategory": "bess",
+    "product": "SENEC.Home V2.1",
+    "active_power_charge_nominal_kW": 5.0,
+    "active_power_discharge_nominal_kW": 5.0,
+    "capacity_kWh": 10,
+    "soc_min": 0.1,
+    "soc_max": 0.9,
+    "efficiency": 0.9,
+    "relative_loss_per_month": 0.02,
+    "energy_carrier": "el",
+    "measurement_fields": ["active_power", "soc"]
+  },
+  "evse": {
+    "category": "consumer",
+    "subcategory": "evse",
+    "product": "VW e-Golf",
+    "capacity_kWh": 32,
+    "active_power_charge_nominal_kW": 7,
+    "active_power_charge_min_kW": 2.6,
+    "efficiency": 0.91,
+    "fuel_economy_kWh/km": 0.16,
+    "energy_carrier": "el",
+    "measurement_fields": ["active_power"],
+    "charging_state_parameter_name": "charging_state",
+    "charging_state_value_map":  {
+      "station_start_up": 0,
+      "station_not_ready": 1,
+      "blocked_by_vehicle": 2,
+      "charging": 3,
+      "error": 4,
+      "suspended": 5
+    }
+  }
+}

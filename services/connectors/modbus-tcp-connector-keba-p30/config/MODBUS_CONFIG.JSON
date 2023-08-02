@@ -1,0 +1,97 @@
+{
+  "read_holding_registers":
+  [
+    {
+      "address": 1000,
+      "count": 2,
+      "unit": 1,
+      "datatypes": ">I"
+    },
+    {
+      "address": 1004,
+      "count": 2,
+      "unit": 1,
+      "datatypes": ">I",
+      "value_maps": {
+        "1004": {
+          "1": 0, "2": 0, "3": 0, "5": 1, "7": 1
+        }
+      }
+    },
+    {
+      "address": 1006,
+      "count": 2,
+      "unit": 1,
+      "datatypes": ">I"
+    },
+    {
+      "address": 1008,
+      "count": 2,
+      "unit": 1,
+      "datatypes": ">I",
+      "scaling_factors": {
+        "1008": 0.001
+      }
+    },
+    {
+      "address": 1010,
+      "count": 2,
+      "unit": 1,
+      "datatypes": ">I",
+      "scaling_factors": {
+        "1010": 0.001
+      }
+    },
+    {
+      "address": 1012,
+      "count": 2,
+      "unit": 1,
+      "datatypes": ">I",
+      "scaling_factors": {
+        "1012": 0.001
+      }
+    },
+    {
+      "address": 1020,
+      "count": 2,
+      "unit": 1,
+      "datatypes": ">I",
+      "scaling_factors": {
+        "1020": 0.001
+      }
+    },
+    {
+      "address": 1040,
+      "count": 2,
+      "unit": 1,
+      "datatypes": ">I"
+    },
+        {
+      "address": 1042,
+      "count": 2,
+      "unit": 1,
+      "datatypes": ">I"
+    },
+    {
+      "address": 1044,
+      "count": 2,
+      "unit": 1,
+      "datatypes": ">I"
+    }
+  ],
+  "write_register":
+  [
+    {
+      "address": 5004,
+      "unit": 1,
+      "datatypes": ">H",
+      "example_value": "0"
+    },
+    {
+      "address": 5014,
+      "unit": 1,
+      "datatypes": ">H",
+      "example_value": "0"
+    }
+  ]
+}

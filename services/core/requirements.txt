@@ -1,0 +1,12 @@
+numpy~=1.19.2
+tensorflow==2.4.1
+influxdb==5.2.3
+redis==3.4.1
+celery==4.4.2
+pandas>=1.2.5
+pymongo==3.11.4
+pyomo==5.7.3
+pika==1.2.0
+scipy~=1.8.0
+pytest~=6.2.5
+python-dotenv~=0.20.0

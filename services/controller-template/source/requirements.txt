@@ -1,0 +1,6 @@
+# Packages required for the app.
+paho-mqtt==1.5
+pytest
+python-dotenv==0.13
+
+pandas==1.2.5

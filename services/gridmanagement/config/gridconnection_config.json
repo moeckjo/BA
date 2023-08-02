@@ -1,0 +1,78 @@
+{
+  "specifications":
+  {
+    "cluster_id": "_12345678-aaaa-bbbb-cccc-111122223333",
+    "uuid4": "_4c129a12-8e6d-5dab-8fde-818427925dd3",
+    "uuid1": "b1e8bb48-f340-11ea-a193-a0999b01da95",
+    "uuid_test": "_6b59f803-389e-5dc3-9d30-6972409afb21",
+    "uuid0": "_02ba39f1-7441-5c61-94e9-f303a1463d48",
+    "uuid5": "ce52507d-b850-53f4-9b70-fa36b2d56789",
+    "uuid": "ce52507d-b850",
+    "unconditional_consumption": 5000,
+    "conditional_consumption": 15000,
+    "dynamic_tariff": false,
+    "grid_consumption_tariff_euro_kwh": 0.29,
+    "grid_feedin_tariff_euro_kwh": 0.15,
+    "limit_tolerance_active_power_abs": 1000,
+    "limit_tolerance_active_power_rel": 0.5,
+    "limit_tolerance_active_power_rel_application_threshold": 100
+  },
+  "metering":
+  {
+    "type": "balance",
+    "flexible_consumers_included": ["evse"],
+    "consumers_excluded": [],
+    "generators_included": ["pv"],
+    "generators_excluded": []
+  },
+  "namespace":
+  {
+    "consumption_setpoint_received": "setpoint_demand_received",
+    "feedin_setpoint_received": "setpoint_feedin_received",
+    "consumption_schedule_applied": "demand_applied",
+    "feedin_schedule_applied": "feedin_applied",
+    "setpoint_active_bool": "setpoints_active",
+    "quota_message":
+    {
+      "calculation_method_key": "quota_type",
+      "content_key": "data",
+      "uuid_key": "plant_id",
+      "block_start_key": "start_time",
+      "time_series_key": "quotas",
+      "timestamp_key": "time",
+      "quota_value_key": "quota",
+      "reference_power_value_key": "reference_power_value",
+      "reference_power_unit_key": "reference_power_unit",
+      "quota_type_key": "type",
+      "quota_type_value_feedin": "PRODUCE",
+      "quota_type_value_consumption": "CONSUME"
+    },
+    "meter_data_message":
+    {
+      "time_series_key": ["data", "selectTimeSeries"],
+      "name_key": "measurement",
+      "unit_key": ["measurementProperties", "unit"],
+      "phase_key": "phase",
+      "timestamp_key": "startDatetime",
+      "uuid_key": "uuid",
+      "values_key": "values",
+      "active_power_name":
+      {
+        "three_phase": "THREE_PHASE_ACTIVE_POWER",
+        "single_phase": "ACTIVE_POWER"
+      },
+      "voltage_name": "LINE_TO_GROUND_VOLTAGE",
+      "phase_map": {"A": 1, "B": 2, "C":  3}
+    },
+    "ev_charging_user_input_message":
+    {
+      "data_key": ["data", "car_charge"],
+      "soc_key": "soc",
+      "soc_target_key": "soc_target",
+      "timestamp_key": "last_update",
+      "capacity_key": "max_capacity",
+      "scheduled_departure_key": "scheduled_departure"
+    }
+  }
+
+}

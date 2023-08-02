@@ -1,0 +1,403 @@
+version: '3'
+
+services:
+    bem-core:
+      build:
+        context: services/core
+        dockerfile: Dockerfile${HOST_ARCH_SUFFIX}  # Dockerfile-aarch64 for ARMv8
+        args:
+          BEM_BASE_IMAGE_TAG: ${BEM_BASE_IMAGE_TAG}
+          TENSORFLOW_IMAGE_TAG: ${TENSORFLOW_IMAGE_TAG}
+          BEM_ROOT_DIR: /bem
+          BEM_BASE_DEPS_WHEELS_ARCHIVE: ${BEM_BASE_DEPS_WHEELS_ARCHIVE_FILENAME}
+          BEM_BASE_DEPS_WHEELS: ${BEM_BASE_DEPS_WHEELS_DIR}
+      image: bem-core:${BEM_CORE_IMAGE_TAG}
+      container_name: &core-name bem-core
+      hostname: *core-name
+      restart: "no"
+      command: celery -A tasks.celery_app worker --loglevel=info -Q core -n core_worker --uid=999 -c=2 --purge
+#      command: python old_test_forecast.py
+#      command: pytest -v /bem/tests
+      environment:
+        - DEBUG=True
+        - DEBUG_FORECASTING=False
+        - DEBUG_OPTIMIZATION=True
+      env_file:
+        - .env
+      depends_on:
+        - influxdb
+        - mongodb
+        - redis
+        - rabbitmq
+      volumes:
+        - ./services/core/config:/bem/config
+        - C:/Users/moeck/Documents/CSV-Output:/bem/CSV-Output
+
+    bem-devicemanagement:
+      build:
+        context: services/devicemanagement
+        dockerfile: Dockerfile
+        args:
+          BEM_BASE_IMAGE_TAG: ${BEM_BASE_IMAGE_TAG}
+          BEM_ROOT_DIR: /bem
+      image: bem-devicemanagement:${BEM_DEVICEMANAGEMENT_IMAGE_TAG}
+      container_name: &devmgmt_name bem-devicemanagement
+      hostname: *devmgmt_name
+      restart: "no"
+      command: celery -A tasks.celery_app worker --loglevel=info --pool=gevent --concurrency=20 -Q devmgmt -n devmgmt_worker --uid=999 --purge
+      env_file:
+        - .env
+      environment:
+        - DEBUG=True
+      depends_on:
+        - influxdb
+        - mongodb
+        - redis
+        - rabbitmq
+#        - bem-orchestration
+      volumes:
+        - ./services/devicemanagement/config:/bem/config
+
+    bem-gridmanagement:
+      build:
+        context: services/gridmanagement
+        dockerfile: Dockerfile
+        args:
+          BEM_BASE_IMAGE_TAG: ${BEM_BASE_IMAGE_TAG}
+          BEM_ROOT_DIR: /bem
+      image: bem-gridmanagement:${BEM_GRIDMANAGEMENT_IMAGE_TAG}
+      container_name: &gridmgmt_name bem-gridmanagement
+      hostname: *gridmgmt_name
+      restart: "no"
+      command: celery -A tasks.celery_app worker --loglevel=info --pool=gevent --concurrency=20 -Q gridmgmt -n gridmgmt_worker --uid=999 --purge
+      env_file:
+        - .env
+      environment:
+        - DEBUG=True
+      depends_on:
+        - influxdb
+        - mongodb
+        - redis
+        - rabbitmq
+        - bem-devicemanagement
+      volumes:
+        - ./services/gridmanagement/config:/bem/config
+      extra_hosts:
+        - "inubit.flexqgrid.online:51.116.238.158" # ESB
+
+    bem-trading:
+      build:
+        context: services/trading
+        dockerfile: Dockerfile
+        args:
+          BEM_BASE_IMAGE_TAG: ${BEM_BASE_IMAGE_TAG}
+          BEM_ROOT_DIR: /bem
+          HOST_ARCH: ${HOST_ARCH_TRADING_SERVICE} # needs to be set to HOST_ARCH=arm64v8- to build for ARM
+          BEM_BASE_DEPS_WHEELS_ARCHIVE: ${BEM_BASE_DEPS_WHEELS_ARCHIVE_FILENAME}
+          BEM_BASE_DEPS_WHEELS: ${BEM_BASE_DEPS_WHEELS_DIR}
+      image: bem-trading:${BEM_TRADING_IMAGE_TAG}
+      container_name: &trading_name bem-trading
+      hostname: *trading_name
+      restart: "no"
+      command: bash start.sh
+      env_file:
+        - .env
+      environment:
+        - DEBUG=True
+      depends_on:
+        - influxdb
+        - mongodb
+        - redis
+        - rabbitmq
+      volumes:
+        - ./services/trading/config:/bem/config
+      extra_hosts:
+        - "www.flexqgrid.net:20.79.84.31" # market platform
+
+
+    bem-orchestration:
+      build:
+        context: services/orchestration
+        dockerfile: Dockerfile
+        args:
+          BEM_BASE_IMAGE_TAG: ${BEM_BASE_IMAGE_TAG}
+          BEM_ROOT_DIR: /bem
+      image: bem-orchestration:${BEM_ORCHESTRATION_IMAGE_TAG}
+      container_name: &orchestration_name bem-orchestration
+      hostname: *orchestration_name
+      restart: "no"
+      command: celery -A ems_setup.celery beat --loglevel=info  #bash -c "sleep 10000"
+      env_file:
+        - .env
+      environment:
+        - DEBUG=True
+      depends_on:
+        - rabbitmq
+        - redis
+        - bem-core
+        - bem-devicemanagement
+        - bem-gridmanagement
+#        - bem-trading
+      volumes:
+        - ./services/orchestration/config:/bem/config
+
+    bem-modbus-server:
+      build:
+        context: services/modbus-server
+        dockerfile: Dockerfile
+        args:
+          BEM_BASE_IMAGE_TAG: ${BEM_BASE_IMAGE_TAG}
+          BEM_ROOT_DIR: /bem
+      image: ${MODBUS_SERVER_HOSTNAME}:${BEM_MODBUS_SERVER_IMAGE_TAG}
+      hostname: &modbus_server_name ${MODBUS_SERVER_HOSTNAME}
+      container_name: *modbus_server_name
+      restart: on-failure
+      command: python run_server.py
+#      command: bash -c "sleep 10000"
+      env_file:
+        - .env
+      depends_on:
+        - rabbitmq
+        - influxdb
+      ports:
+        - 5020:5020
+
+    bem-modbus-test-client:
+      build:
+        context: services/modbus-test-client
+        dockerfile: Dockerfile
+        args:
+          BEM_BASE_IMAGE_TAG: ${BEM_BASE_IMAGE_TAG}
+          BEM_ROOT_DIR: /bem
+      image: bem-modbus-test-client:${BEM_MODBUS_TEST_CLIENT_IMAGE_TAG}
+      container_name: &modbus_test_client_name bem-modbus-test-client
+      hostname: *modbus_test_client_name
+      command: python ./test_tcp_server.py
+#      command: python ./test_rtu_server.py
+      env_file:
+        - .env
+      restart: 'no'
+
+    rabbitmq:
+        image: rabbitmq:3.8-alpine
+        container_name: &rabbitmq_name $RABBITMQ_HOSTNAME
+        hostname: *rabbitmq_name
+        restart: 'always'
+
+    redis:
+        image: redis:5.0-alpine
+        container_name: redis
+        restart: 'always'
+
+
+    influxdb:
+        #restart: always
+        image: influxdb:1.7
+        container_name: &influx_name $INFLUX_HOSTNAME
+        hostname: *influx_name
+        restart: 'always'
+        user: "${UID}:${GID}"
+        volumes:
+            - "./data/influxdb:/var/lib/influxdb"
+        ports:
+            - "${INFLUX_PORT}:${INFLUX_PORT}"
+        environment:
+            - INFLUXDB_DB=${DB_NAME}
+            - INFLUXDB_HTTP_AUTH_ENABLED=true
+            - INFLUXDB_ADMIN_USER=${ADMIN_NAME}
+            - INFLUXDB_ADMIN_PASSWORD=${ADMIN_PASSWORD}
+            - INFLUXDB_LOGGING_LEVEL=warn
+    grafana:
+        image: grafana/grafana:latest
+        container_name: grafana
+        hostname: grafana
+        restart: 'always'
+        ports:
+            - "${GRAFANA_PORT}:${GRAFANA_PORT}"
+        depends_on:
+            - influxdb
+        volumes:
+#          # Data persistency
+#          # sudo mkdir -p /srv/docker/grafana/data; chown 472:472 /srv/docker/grafana/data
+            - "./data/grafana:/var/lib/grafana"
+
+#    flower:
+#      image: mher/flower
+#      container_name: flower
+#      environment:
+#        - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+#        - FLOWER_PORT=8888
+#      ports:
+#        - 8080:8888
+
+    mongodb:
+        #restart: always
+        image: mongo:4.4
+        container_name: &mongo_name $MONGO_HOSTNAME
+        hostname: *mongo_name
+        restart: 'always'
+        user: "${UID}:${GID}"
+        ports:
+            - "${MONGO_PORT}:${MONGO_PORT}"
+        environment:
+            #- MONGO_INITDB_DATABASE=${DB_NAME}
+            - MONGO_INITDB_ROOT_USERNAME=${ADMIN_NAME}
+            - MONGO_INITDB_ROOT_PASSWORD=${ADMIN_PASSWORD}
+        volumes:
+            - "./data/mongodb:/data/db"
+
+    mqtt-broker:
+        image: eclipse-mosquitto:1.6.10
+        #image: arm64v8/eclipse-mosquitto:1.6.10
+        container_name: &mqtt_broker_name ${MQTT_BROKER_HOST}
+        hostname: *mqtt_broker_name
+        restart: always
+        ports:
+            - ${MQTT_BROKER_PORT}:${MQTT_BROKER_PORT}
+
+    bem-connector-interface:
+        build:
+            context: services/connector-interface/source
+            dockerfile: Dockerfile
+            args:
+              BEM_BASE_IMAGE_TAG: ${BEM_BASE_IMAGE_TAG}
+              BEM_ROOT_DIR: /bem
+        image: ${CONNECTOR_INTERFACE_NAME}:${BEM_CONNECTOR_INTERFACE_IMAGE_TAG}
+        hostname: &connector_interface_name ${CONNECTOR_INTERFACE_NAME}
+        container_name: *connector_interface_name
+        restart: always
+        user: "${UID}:${GID}"
+        depends_on:
+          - mqtt-broker
+          - rabbitmq
+        volumes:
+          - ./services/connector-interface/config/:/bem/interface/config/
+        env_file:
+          - .env
+          - ./services/connector-interface/.env
+
+    modbus-tcp-connector-keba-p30:
+        build:
+            context: services/connectors/modbus-tcp-connector-keba-p30/source
+            dockerfile: Dockerfile
+        image: ${MODBUS_TCP_CONNECTOR_KEBA_P30_NAME}:${MODBUS_TCP_CONNECTOR_KEBA_P30_IMAGE_TAG}
+        hostname: &modbus-tcp_connector_keba_p30_name ${MODBUS_TCP_CONNECTOR_KEBA_P30_NAME}
+        container_name: *modbus-tcp_connector_keba_p30_name
+        restart: always
+        user: "${UID}:${GID}"
+        depends_on:
+            - mqtt-broker
+        volumes:
+          - ./services/connectors/modbus-tcp-connector-keba-p30/config/:/source/connector/config/
+        env_file:
+          - .env
+          - ./services/connectors/modbus-tcp-connector-keba-p30/.env
+
+    bem-controller-keba-p30:
+        build:
+            context: services/controller-template/source
+            dockerfile: Dockerfile
+        image: ${BEM_CONTROLLER_NAME}:${BEM_CONTROLLER_IMAGE_TAG}
+        hostname: &bem_controller_keba_p30_name ${BEM_CONTROLLER_KEBA_P30_NAME}
+        container_name: *bem_controller_keba_p30_name
+        restart: always
+        user: "${UID}:${GID}"
+        depends_on:
+            - mqtt-broker
+        env_file:
+          - .env
+          - services/controller-template/config/.env-keba-p30
+
+    rscp-connector-e3dc:
+        build:
+          context: services/connectors/rscp-connector-e3dc/source
+          dockerfile: Dockerfile
+        image: ${RSCP_CONNECTOR_E3DC_NAME}:${RSCP_CONNECTOR_E3DC_IMAGE_TAG}
+        hostname: &rscp_connector_e3dc_name ${RSCP_CONNECTOR_E3DC_NAME}
+        container_name: *rscp_connector_e3dc_name
+        restart: always
+        user: "${UID}:${GID}"
+        depends_on:
+          - mqtt-broker
+        volumes:
+          - ./services/connectors/rscp-connector-e3dc/config/:/source/connector/config/
+        env_file:
+          - .env
+          - ./services/connectors/rscp-connector-e3dc/.env
+
+    bem-controller-e3dc:
+        build:
+          context: services/controller-template/source
+          dockerfile: Dockerfile
+        image: ${BEM_CONTROLLER_NAME}:${BEM_CONTROLLER_IMAGE_TAG}
+        hostname: ${BEM_CONTROLLER_E3DC_NAME}
+        container_name: ${BEM_CONTROLLER_E3DC_NAME}
+        restart: on-failure
+        user: "${UID}:${GID}"
+        depends_on:
+          - mqtt-broker
+        env_file:
+          - .env
+          - services/controller-template/config/.env-e3dc
+
+# TESTING PURPOSE
+    mqtt-test-listener:
+        build:
+            context: services/00_testing_purpose/mqtt-test-listener/source
+            dockerfile: Dockerfile
+        image: ${MQTT_TEST_LISTENER_NAME}:${MQTT_TEST_LISTENER_IMAGE_TAG}
+        hostname: &mqtt_test_listener_name ${MQTT_TEST_LISTENER_NAME}
+        container_name: *mqtt_test_listener_name
+        restart: "no"
+        depends_on:
+            - mqtt-broker
+        env_file:
+          - .env
+          - services/00_testing_purpose/mqtt-test-listener/.env
+
+    mqtt-test-publisher:
+        build:
+            context: services/00_testing_purpose/mqtt-test-publisher/source
+            dockerfile: Dockerfile
+        image: ${MQTT_TEST_PUBLISHER_NAME}:${MQTT_TEST_PUBLISHER_IMAGE_TAG}
+        hostname: &mqtt_test_publisher_name ${MQTT_TEST_PUBLISHER_NAME}
+        container_name: *mqtt_test_publisher_name
+        restart: "no"
+        depends_on:
+            - mqtt-broker
+        env_file:
+          - .env
+          - services/00_testing_purpose/mqtt-test-publisher/.env
+        volumes:
+          - ./services/00_testing_purpose/mqtt-test-publisher/config:/source/connector/config
+
+    rabbitmq-test-publisher:
+        build:
+          context: services/00_testing_purpose/rabbitmq-test-publisher/source
+          dockerfile: Dockerfile
+        image: ${RABBITMQ_TEST_PUBLISHER_NAME}:${RABBITMQ_TEST_PUBLISHER_IMAGE_TAG}
+        hostname: &rabbitmq_test_publisher_name ${RABBITMQ_TEST_PUBLISHER_NAME}
+        container_name: *rabbitmq_test_publisher_name
+        restart: "no"
+        depends_on:
+            - rabbitmq
+        volumes:
+          - ./services/00_testing_purpose/rabbitmq-test-publisher/config:/source/producer/config/
+        env_file:
+          - .env
+          - services/00_testing_purpose/rabbitmq-test-publisher/.env
+
+    mqtt-test-publisher-cli:
+        image: hivemq/mqtt-cli:4.7.2
+        container_name: mqtt-test-publisher-cli
+        restart: on-failure
+#        depends_on:
+#            - modbus-tcp-connector-adstec
+#            - mqtt-broker
+#            - mqtt-test-listener
+        command: >
+            pub
+            -h ${MQTT_BROKER_HOST}
+            -p ${MQTT_BROKER_PORT}
+            -t "modbus-tcp-connector-keba-p30/sensor/charging_state"
+            -m "{\"value\": 2, \"timestamp\": 1650526229188}"

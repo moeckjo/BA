@@ -1,0 +1,28 @@
+{
+  "sensor": {
+    "vsoc": "/sensor/vsoc",
+    "pv_active_power": "/sensor/pv_active_power",
+    "battery_active_power": "/sensor/battery_active_power",
+    "ext_generator_active_power": "/sensor/ext_generator_active_power",
+    "home_consumption_active_power": "/sensor/home_consumption_active_power",
+    "grid_exchange_active_power": "/sensor/grid_exchange_active_power",
+    "soc": "/sensor/soc",
+    "charge_cycles": "/sensor/charge_cycles",
+    "current": "/sensor/current",
+    "status_code": "/sensor/status_code",
+    "error_code": "/sensor/error_code",
+    "module_voltage": "/sensor/module_voltage",
+    "terminal_voltage": "/sensor/terminal_voltage",
+    "ems_used_charge_limit": "/sensor/ems_used_charge_limit",
+    "ems_bat_charge_limit": "/sensor/ems_bat_charge_limit",
+    "ems_dcdc_charge_limit": "/sensor/ems_dcdc_charge_limit",
+    "ems_user_charge_limit": "/sensor/ems_user_charge_limit",
+    "ems_used_discharge_limit": "/sensor/ems_used_discharge_limit",
+    "ems_bat_discharge_limit": "/sensor/ems_bat_discharge_limit",
+    "ems_dcdc_discharge_limit": "/sensor/ems_dcdc_discharge_limit",
+    "ems_user_discharge_limit": "/sensor/ems_user_discharge_limit"
+  },
+  "actuator": {
+    "/actuator/battery_active_power": "battery_active_power"
+  }
+}
