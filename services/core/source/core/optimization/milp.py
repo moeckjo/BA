@@ -67,19 +67,31 @@ class MILP:
         list_help_feedin= []
         list_help_limit_active_feedin= []
         list_help_limit_active_consum= []
+        list_help_limit_consum= []
+        list_help_limit_feedin =[]
+        secondmarket_feedin =[]
+        secondmarket_con= []
+
 
         for t in self.model.T:
             list_help_consum.append (getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_consum")[t].value)
             list_help_feedin.append (getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_feedin")[t].value)
             list_help_limit_active_feedin.append(getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_feedin_limit_active")[t])
             list_help_limit_active_consum.append(getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_consum_limit_active")[t])
+            list_help_limit_consum.append(getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_el_limit_neg")[t])
+            list_help_limit_feedin.append(getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_el_limit_pos")[t])
+            secondmarket_feedin.append(getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_feedin")[t].value)
+            secondmarket_con.append(getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_consum")[t].value)
+
+
+
 
         Zielfunktionswert = self.model.obj ()
 
         #CSV OUTPUT FILE
         #df = pandas.read_csv("/bem/CSV-Output/Outputfile.csv")
         # Erstellen des DataFrames aus den Listen
-        data = {'Konsum': list_help_consum, 'Feedin': list_help_feedin, 'consumlimit_active': list_help_limit_active_consum, 'feedinlimit_active':list_help_limit_active_feedin, 'Zielfunktionswert': Zielfunktionswert}
+        data = {'Konsum': list_help_consum, 'Feedin': list_help_feedin, 'consumlimit_active': list_help_limit_active_consum, 'feedinlimit_active':list_help_limit_active_feedin,'limit_consum':list_help_limit_consum,'limit_feedin':list_help_limit_feedin,'secondmarket_consum':secondmarket_con,'secondmarket_feedin':secondmarket_feedin, 'Zielfunktionswert': Zielfunktionswert}
         df = pandas.DataFrame(data)
         logger.debug (df)
         
@@ -128,8 +140,8 @@ class CostMILP(MILP):
             #Part von Jonas
             P_market_feedin =getattr(model,f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_feedin") # [W]
             P_market_consum =getattr(model,f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_consum") # [W]
-            price_market_feedin = 7 # [cent/W]
-            price_market_consum = 7 # [cent/W]
+            price_market_feedin = 2 # [cent/W]
+            price_market_consum = 2 # [cent/W]
            
             # Get variables defined with GCP
             feedin = getattr(model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_neg")  # [W]

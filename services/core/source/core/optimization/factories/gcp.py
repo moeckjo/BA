@@ -169,9 +169,6 @@ def factory(model: ConcreteModel, name: str, specification: dict, devices: typin
         return g('P_market_consum')[t] == (g('P_pos')[t]-g('P_el_limit_pos')[t])*g('consum_limit_active')[t]
 
 
-    
-
-    
     #TESTING
     #s('test_constriant' , Constraint (model.T,rule = test_constraint))
     s('con_difference_limit_feedin', Constraint(model.T, rule=difference_limit_feedin))

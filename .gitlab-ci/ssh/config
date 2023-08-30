@@ -1,0 +1,4 @@
+Host iik-rhino-05.fzi.de
+User iik
+CheckHostIP no
+HostKeyAlgorithms ssh-ed25519
