@@ -74,12 +74,12 @@ class MILP:
 
 
         for t in self.model.T:
-            list_help_consum.append (getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_neg")[t].value)
-            list_help_feedin.append (getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_pos")[t].value)
+            list_help_consum.append (getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_pos")[t].value)
+            list_help_feedin.append (getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_neg")[t].value)
             list_help_limit_active_feedin.append(getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_feedin_limit_active")[t])
             list_help_limit_active_consum.append(getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_consum_limit_active")[t])
-            list_help_limit_consum.append(getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_el_limit_neg")[t])
-            list_help_limit_feedin.append(getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_el_limit_pos")[t])
+            list_help_limit_consum.append(getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_el_limit_pos")[t])
+            list_help_limit_feedin.append(getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_el_limit_neg")[t])
             secondmarket_feedin.append(getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_feedin")[t].value)
             secondmarket_con.append(getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_consum")[t].value)
 
