@@ -66,6 +66,7 @@ class MILP:
          #Part von Jonas
         P_market_feedin =getattr(self.model,f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_feedin") # [W]
         P_market_consum =getattr(self.model,f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_consum") # [W]
+        Speicher=getattr(self.model, f"{os.getenv('BESS_KEY')}_E_charged_net")
         price_market_feedin = 0.02 # [cent/W]
         price_market_consum = 0.02 # [cent/W]
            
@@ -77,7 +78,8 @@ class MILP:
         energy_cost_output = sum(
             (self.model.c_grid_cons[t] * consumption[t].value / 1000 - self.model.c_grid_feedin[t] * feedin[t].value / 1000) * (
                     self.model.dt / 3600) + (price_market_consum * P_market_consum[t].value + price_market_feedin* P_market_feedin[t].value)*(1/100) for t in self.model.T)
-            
+        energy_cost_output -= Speicher.value / (1000 * 3600) * sum(
+                    self.model.c_grid_cons[t] for t in self.model.T) / len(self.model.T)    
         
         list_help_consum= []
         list_help_feedin= []
