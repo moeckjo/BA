@@ -62,7 +62,23 @@ class MILP:
         
         logger.debug(f'Solver options: {solver.options}')
         result = solver.solve(self.model, tee=True)
-        #TESTING CSV OUTPUT FILE
+        #TESTING CSV OUTPUT FILE JONAS and energy cost 
+         #Part von Jonas
+        P_market_feedin =getattr(self.model,f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_feedin") # [W]
+        P_market_consum =getattr(self.model,f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_consum") # [W]
+        price_market_feedin = 0.02 # [cent/W]
+        price_market_consum = 0.02 # [cent/W]
+           
+        # Get variables defined with GCP
+        feedin = getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_neg")  # [W]
+        consumption = getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_pos")  # [W]
+        # EUR / kWh * (W * kW/W) * (s * h/s) = EUR
+
+        energy_cost_output = sum(
+            (self.model.c_grid_cons[t] * consumption[t].value / 1000 - self.model.c_grid_feedin[t] * feedin[t].value / 1000) * (
+                    self.model.dt / 3600) + (price_market_consum * P_market_consum[t].value + price_market_feedin* P_market_feedin[t].value)*(1/100) for t in self.model.T)
+            
+        
         list_help_consum= []
         list_help_feedin= []
         list_help_limit_active_feedin= []
@@ -82,6 +98,7 @@ class MILP:
             list_help_limit_feedin.append(getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_el_limit_neg")[t])
             secondmarket_feedin.append(getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_feedin")[t].value)
             secondmarket_con.append(getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_consum")[t].value)
+            
 
 
 
@@ -91,7 +108,7 @@ class MILP:
         #CSV OUTPUT FILE
         #df = pandas.read_csv("/bem/CSV-Output/Outputfile.csv")
         # Erstellen des DataFrames aus den Listen
-        data = {'Konsum': list_help_consum, 'Feedin': list_help_feedin, 'consumlimit_active': list_help_limit_active_consum, 'feedinlimit_active':list_help_limit_active_feedin,'limit_consum':list_help_limit_consum,'limit_feedin':list_help_limit_feedin,'secondmarket_consum':secondmarket_con,'secondmarket_feedin':secondmarket_feedin, 'Zielfunktionswert': Zielfunktionswert}
+        data = {'Konsum': list_help_consum, 'Feedin': list_help_feedin, 'consumlimit_active': list_help_limit_active_consum, 'feedinlimit_active':list_help_limit_active_feedin,'limit_consum':list_help_limit_consum,'limit_feedin':list_help_limit_feedin,'secondmarket_consum':secondmarket_con,'secondmarket_feedin':secondmarket_feedin, 'Zielfunktionswert': Zielfunktionswert, 'Gesammtkostenenergie':energy_cost_output}
         df = pandas.DataFrame(data)
         logger.debug (df)
         
@@ -140,8 +157,8 @@ class CostMILP(MILP):
             #Part von Jonas
             P_market_feedin =getattr(model,f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_feedin") # [W]
             P_market_consum =getattr(model,f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_consum") # [W]
-            price_market_feedin = 2 # [cent/W]
-            price_market_consum = 2 # [cent/W]
+            price_market_feedin = 0.02 # [cent/W]
+            price_market_consum = 0.02 # [cent/W]
            
             # Get variables defined with GCP
             feedin = getattr(model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_neg")  # [W]
@@ -162,7 +179,7 @@ class CostMILP(MILP):
             # Get all Constraint objects in the model
             constraints = model.component_objects(Constraint)
 
-            # Print the names and indices of each Constraint
+            # Print the names and indices of each Constraint JONAS
             for constraint in constraints:
                 print("Constraint Name:", constraint.name)
                 print("Constraint Index:", constraint.index_set())

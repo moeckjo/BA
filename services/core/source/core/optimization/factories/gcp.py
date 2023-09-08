@@ -54,8 +54,6 @@ def factory(model: ConcreteModel, name: str, specification: dict, devices: typin
         logger.debug(f"There is not grid setpoint, but grid limits: {grid_restrictions}")
         # Replace None values – indicating no limit – with static consumption limit or artifical high feed-in limit
         #Part von Jonas
-        logger.debug ("TEST")
-        
         consum_limit_active= [(1 if (limit is not None) and ( grid_consumption_static_limit > limit > specification["unconditional_consumption"]) else 0) for limit in grid_restrictions]
         feedin_limit_active = [(1 if (limit is not None) and (limit > -(model.M.value)) and (limit < 0)  else 0) for limit in grid_restrictions]
         logger.debug(f'Grid limits_active: cons={consum_limit_active}, feedin={feedin_limit_active}')
@@ -129,7 +127,7 @@ def factory(model: ConcreteModel, name: str, specification: dict, devices: typin
     s('consum_limit_active', Param(model.T, initialize={i: v for i, v in enumerate(consum_limit_active, start=1)}))
     
 
-    limit_active = 1
+    limit_active = 0
     setpoint_active = 0
 
     s('P_load_el_inflex', Param(model.T, initialize={i: v for i, v in enumerate(forecast_load_el, start=1)}))
