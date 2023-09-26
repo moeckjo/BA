@@ -344,10 +344,10 @@ class Scheduler:
         consum_limit_active = getattr(model,f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_consum_limit_active")
         test_var_consum = getattr(model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_consum")
         test_var_feedin = getattr(model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_feedin")
-        logger.debug (test_var_feedin[t].value)
 
-        #TESTING jonas
-        #logger.debug(f'Grid limits_active: cons={consum_limit_active}, feedin={feedin_limit_active}')
+        #Part von Jonas. Algorithmus der die Lösung einer Iteration als Input nimmt um durch einfügen von oberen und unteren Schranken
+        #den zuletzt ermittelten Wert für die angebotene Quotensenkung/erhöhung auschließt.
+        
         if (consum_limit_active[t] == 1):
             #logger.debug("consumlimit active")
             if getattr(model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_consum")[t].value == 0:
@@ -357,7 +357,7 @@ class Scheduler:
                 return getattr(model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_consum")[t] >= (test_var_consum[t].value+1)
             #größer 0 = buy consumlimit
             elif getattr(model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_consum")[t].value >= 1:
-                return getattr(model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_consum")[t] <= (test_var_consum[t].value-1)
+                return getattr(model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_consum")[t] >= (test_var_consum[t].value+1)
 
         if (feedin_limit_active[t] == 1):
             #logger.debug("feedinlimit active")
@@ -368,7 +368,7 @@ class Scheduler:
                 return getattr(model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_feedin")[t] >= (int(test_var_feedin[t].value+1))
             #größer 0 = buy feedinlimit    
             elif getattr(model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_feedin")[t].value >= 1:
-                return getattr(model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_feedin")[t] <=(test_var_feedin[t].value-1)
+                return getattr(model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_feedin")[t] >=(test_var_feedin[t].value+1)
         
         elif (consum_limit_active[t] == 0): 
             return Constraint.Skip
@@ -392,19 +392,7 @@ class Scheduler:
         schedules: typing.Dict[str, typing.Dict[str, int]] = self.get_and_save_solution(results.solver)
         return schedules
     
-    #TESTING PART VON JONAS
-    """
-    def get_list_for_bids(model, bids_feedin,bids_consum):
-        help_consum= []
-        help_feedin = []
-        for t in model.model.T:
-            help_consum.append (getattr(model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_consum")[t].value)
-            help_feedin.append (getattr(model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_feedin")[t].value)
-        bids_consum.append (help_consum)
-        bids_feedin.append (help_feedin)
-        logger.debug(help_consum)
-        return {}
-    """    
+ 
     def resolve (self):
         logger.debug ("Komme bis hier")
         bids_feedin= []

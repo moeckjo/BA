@@ -47,9 +47,7 @@ class MILP:
         self.components.append(key)
 
     def solve(self, solver_type: str = 'glpk', time_limit=60, mipgap=0.05, verbose=True):
-        #TESTING JONAS
-        
-        
+
         if self.objective_created is False:
             raise RuntimeError('No objective')
 
@@ -62,13 +60,14 @@ class MILP:
         
         logger.debug(f'Solver options: {solver.options}')
         result = solver.solve(self.model, tee=True)
-        #TESTING CSV OUTPUT FILE JONAS and energy cost 
-         #Part von Jonas
+        
+        
+        #print results to csv output file jonas 
         P_market_feedin =getattr(self.model,f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_feedin") # [W]
         P_market_consum =getattr(self.model,f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_consum") # [W]
         Speicher=getattr(self.model, f"{os.getenv('BESS_KEY')}_E_charged_net")
-        price_market_feedin = 0.02 # [cent/W]
-        price_market_consum = 0.02 # [cent/W]
+        price_market_feedin = 0.02 # [EURO/W]
+        price_market_consum = 0.02 # [EURO/W]
            
         # Get variables defined with GCP
         feedin = getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_neg")  # [W]
@@ -78,9 +77,12 @@ class MILP:
         energy_cost_output = sum(
             (self.model.c_grid_cons[t] * consumption[t].value / 1000 - self.model.c_grid_feedin[t] * feedin[t].value / 1000) * (
                     self.model.dt / 3600) + (price_market_consum * P_market_consum[t].value + price_market_feedin* P_market_feedin[t].value)*(1/100) for t in self.model.T)
-        energy_cost_output -= Speicher.value / (1000 * 3600) * sum(
+        if os.getenv('BESS_KEY') in self.components:
+            energy_cost_output -= Speicher.value / (1000 * 3600) * sum(
                     self.model.c_grid_cons[t] for t in self.model.T) / len(self.model.T)    
         
+        list_help_consum_tarif=[]
+        list_help_feedin_tarif=[]
         list_help_consum= []
         list_help_feedin= []
         list_help_limit_active_feedin= []
@@ -89,9 +91,15 @@ class MILP:
         list_help_limit_feedin =[]
         secondmarket_feedin =[]
         secondmarket_con= []
+        Konsum_gesammt= 0
+        Feedin_gesammt= 0
 
 
         for t in self.model.T:
+            Konsum_gesammt+= getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_pos")[t].value
+            Feedin_gesammt+= getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_neg")[t].value
+            list_help_consum_tarif.append (self.model.c_grid_cons[t])
+            list_help_feedin_tarif.append (self.model.c_grid_feedin[t])
             list_help_consum.append (getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_pos")[t].value)
             list_help_feedin.append (getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_neg")[t].value)
             list_help_limit_active_feedin.append(getattr(self.model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_feedin_limit_active")[t])
@@ -110,7 +118,7 @@ class MILP:
         #CSV OUTPUT FILE
         #df = pandas.read_csv("/bem/CSV-Output/Outputfile.csv")
         # Erstellen des DataFrames aus den Listen
-        data = {'Konsum': list_help_consum, 'Feedin': list_help_feedin, 'consumlimit_active': list_help_limit_active_consum, 'feedinlimit_active':list_help_limit_active_feedin,'limit_consum':list_help_limit_consum,'limit_feedin':list_help_limit_feedin,'secondmarket_consum':secondmarket_con,'secondmarket_feedin':secondmarket_feedin, 'Zielfunktionswert': Zielfunktionswert, 'Gesammtkostenenergie':energy_cost_output}
+        data = {'Konsum': list_help_consum, 'Feedin': list_help_feedin, 'consumlimit_active': list_help_limit_active_consum, 'feedinlimit_active':list_help_limit_active_feedin,'limit_consum':list_help_limit_consum,'limit_feedin':list_help_limit_feedin,'secondmarket_consum':secondmarket_con,'secondmarket_feedin':secondmarket_feedin, 'Zielfunktionswert': Zielfunktionswert, 'Gesammtkostenenergie':energy_cost_output,'Tarif_consum':list_help_consum_tarif,'Tarif_feedin':list_help_feedin_tarif, 'Konsumgesammt':Konsum_gesammt,'feedin_gesammt':Feedin_gesammt}
         df = pandas.DataFrame(data)
         logger.debug (df)
         
@@ -150,17 +158,17 @@ class CostMILP(MILP):
                 device keys per subcategory and loop over this list for each subcategory to add the attributes
                 of each device model of this subcategory.
             """
-            #Jonas Part
+        
             """
             variables= [v for v in model.component_objects (Var,descend_into=True)]
             logger.debug(variables)
 
             """
-            #Part von Jonas
+            # Erweiterung der Zielfunktion um die Entscheidungsvariablen sowie parameter für die Erweiterung der Zielfunktion. Part von Jonas
             P_market_feedin =getattr(model,f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_feedin") # [W]
             P_market_consum =getattr(model,f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_market_consum") # [W]
-            price_market_feedin = 0.02 # [cent/W]
-            price_market_consum = 0.02 # [cent/W]
+            price_market_feedin = 0.002 # [Euro/W]
+            price_market_consum = 0.002 # [Euro/W]
            
             # Get variables defined with GCP
             feedin = getattr(model, f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_P_neg")  # [W]
@@ -177,15 +185,6 @@ class CostMILP(MILP):
                 energy_cost -= getattr(model, f"{os.getenv('BESS_KEY')}_E_charged_net") / (1000 * 3600) * sum(
                     model.c_grid_cons[t] for t in model.T) / len(model.T)
 
-            #TESTING JONAS
-            # Get all Constraint objects in the model
-            constraints = model.component_objects(Constraint)
-
-            # Print the names and indices of each Constraint JONAS
-            for constraint in constraints:
-                print("Constraint Name:", constraint.name)
-                print("Constraint Index:", constraint.index_set())
-                
 
             # Penalty functions
             penalties = 0

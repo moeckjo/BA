@@ -35,10 +35,6 @@ def factory(model: ConcreteModel, name: str, specification: dict, devices: typin
 
     grid_consumption_static_limit = specification["unconditional_consumption"] + specification[
         "conditional_consumption"]
-    #TESTING JONAS
-    #grid_restrictions = [8000] * int((len(model.T)/2))  + [-5000] * int((len(model.T)/2))
-    #grid_restrictions = [-5000] * len(model.T) 
-
 
     if grid_restrictions is None and grid_setpoints is None:
         logger.debug("No grid limits or grid setpoint.")
@@ -53,7 +49,8 @@ def factory(model: ConcreteModel, name: str, specification: dict, devices: typin
     elif grid_restrictions is not None and grid_setpoints is None:
         logger.debug(f"There is not grid setpoint, but grid limits: {grid_restrictions}")
         # Replace None values – indicating no limit – with static consumption limit or artifical high feed-in limit
-        #Part von Jonas
+        #Part von Jonas; wenn ein Limit vom Netzbetreiber übermittelt wird, wird dies hier ausgewertet und entschieden ob ein Bezugs oder 
+        #Einspeiselimit vorliegt. 
         consum_limit_active= [(1 if (limit is not None) and ( grid_consumption_static_limit > limit > specification["unconditional_consumption"]) else 0) for limit in grid_restrictions]
         feedin_limit_active = [(1 if (limit is not None) and (limit > -(model.M.value)) and (limit < 0)  else 0) for limit in grid_restrictions]
         logger.debug(f'Grid limits_active: cons={consum_limit_active}, feedin={feedin_limit_active}')
@@ -143,7 +140,7 @@ def factory(model: ConcreteModel, name: str, specification: dict, devices: typin
 
 
 
-    # Set decision variables JONAS
+    #Deffinieren der Entscheidungsvariablen im Model JONAS
     # Var(index, within=domain)
     s('P_pos', Var(model.T, within=NonNegativeReals))  # Grid consumption [W]
     s('P_neg', Var(model.T, within=NonNegativeReals))  # Grid feed-in [W]
@@ -156,7 +153,7 @@ def factory(model: ConcreteModel, name: str, specification: dict, devices: typin
     s('b_pos_above_setpoint', Var(model.T, within=Binary, initialize={i: 0 for i in model.T}))  # Flag if actual power >= setpoint
     s('b_neg_above_setpoint', Var(model.T, within=Binary, initialize={i: 0 for i in model.T}))  # Flag if actual power >= setpoint
 
-    #Part von Jonas
+    #Part von Jonas.Deffinieren der Entscheidungsvariablen im Model
     s('P_market_feedin', Var(model.T, within=Reals)) # Amount that offer/ buy on second market for feedin [W]
     s('P_market_consum', Var(model.T, within=Reals)) # Amount that offer/ buy on second market for consumption [W]
 
@@ -167,8 +164,7 @@ def factory(model: ConcreteModel, name: str, specification: dict, devices: typin
         return g('P_market_consum')[t] == (g('P_pos')[t]-g('P_el_limit_pos')[t])*g('consum_limit_active')[t]
 
 
-    #TESTING
-    #s('test_constriant' , Constraint (model.T,rule = test_constraint))
+    #Part von Jonas. Setzten der eingeführten Nebenbedingung, die letztes Ergebnis auschließt
     s('con_difference_limit_feedin', Constraint(model.T, rule=difference_limit_feedin))
     s('con_difference_limit_consum', Constraint(model.T, rule=difference_limit_consum))
 

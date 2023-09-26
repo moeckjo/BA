@@ -134,7 +134,7 @@ def run(call_task=True, test_opt_with_primary_quotas: bool = False):
     # Note: If setting grid limits to use them as quotas, it's sufficient to define limits until 6 hours
     #       after window start. Any limits after that time are not considered as quotas anyways.
 
-    grid_limits_by_hour = {window_start.hour: -3000, 14: 4000, 15: 2000}
+    grid_limits_by_hour = {window_start.hour: -3000, 14: 7000, 15: 6000}
     #grid_limits_by_hour = {window_start.hour: -5000}
     
 

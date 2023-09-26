@@ -256,7 +256,7 @@ def create_schedules(forecasts: typing.Union[typing.List[dict], None],
             **kwargs
         )
         schedules_are_setpoints = False
-    #TESTING VON JONAS
+    #Part von Jonas. Hier wird anstatt schedule (), resolve aufgerufen die das Problem mehrfach löst sobald ein Limit gesetz ist.
     consum_limit_active=f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_consum_limit_active"
     feedin_limit_active=f"{os.getenv('GRID_CONNECTION_POINT_KEY')}_feedin_limit_active"
     if grid_power_setpoint is None: 
